@@ -72,7 +72,7 @@ def remove_modal(driver):
 def extract_registration_data(driver, wait):
     try:
         remove_modal(driver)
-        time.sleep(1)
+        # time.sleep(1)
         registration_tab = wait.until(EC.element_to_be_clickable((By.ID, "registration-tab")))
         driver.execute_script("arguments[0].scrollIntoView(true);", registration_tab)
         time.sleep(1)
@@ -122,7 +122,7 @@ def main():
 
     try:
         driver.get(search_url)
-        time.sleep(5)
+        # time.sleep(5)
         course_links = driver.find_elements(By.CSS_SELECTOR, "a.js-course-detail-link")
         course_urls = list({link.get_attribute("href") for link in course_links if "/detail/" in link.get_attribute("href")})
 
@@ -133,12 +133,13 @@ def main():
             print(f"🔗 [{idx}] Visiting: {url}")
             print(f"==============================")
             driver.get(url)
-            time.sleep(2)
+            # time.sleep(2)
 
             try:
                 wait.until(EC.presence_of_element_located((By.ID, "overview")))
                 fields = {
                     "Course URL": url,
+                    "University Name": None,
                     "Degree": None,
                     "Course Location": None,
                     "Teaching Language": None,
@@ -152,7 +153,14 @@ def main():
                     "Submit Application To": None,
                     "Course Website": None
                 }
-
+                try:
+                    university_name = driver.find_element(By.CSS_SELECTOR, "a.c-contact__link")
+                    fields["University Name"] = university_name.text.strip()
+                except:
+                    fields["University Name"] = None
+                
+                course_data.append(fields)
+                    
                 overview = driver.find_element(By.ID, "overview")
                 dt_elements = overview.find_elements(By.TAG_NAME, "dt")
                 for dt in dt_elements:
