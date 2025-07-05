@@ -101,8 +101,8 @@ def extract_registration_data(driver, wait):
 
 def start_scraping():
     query = urllib.parse.quote(entry_query.get())
-    degree = degree_map[degree_dropdown.get()]
-    lang = language_map[language_dropdown.get()]
+    degree_selected = [k for k, var in degree_vars.items() if var.get() == 1]
+    lang_selected = [k for k, var in language_vars.items() if var.get() == 1]
     bgn = bgn_map[bgn_dropdown.get()]
     limit = entry_limit.get().strip()
 
@@ -112,8 +112,8 @@ def start_scraping():
     base_url = "https://www2.daad.de/deutschland/studienangebote/international-programmes/en/result/"
     params = {
         "q": query,
-        "degree[]": [degree],
-        "lang[]": [lang],
+        "degree[]": [degree_map[d] for d in degree_selected],
+        "lang[]": [language_map[l] for l in lang_selected],
         "bgn[]": [bgn],
         "limit": limit,
         "sort": "4",
@@ -131,6 +131,8 @@ def start_scraping():
     driver = setup_driver()
     wait = WebDriverWait(driver, 10)
     course_data = []
+    progress_bar.set(0)
+    progress_bar.update()
 
     try:
         driver.get(search_url)
@@ -138,6 +140,7 @@ def start_scraping():
         course_links = driver.find_elements(By.CSS_SELECTOR, "a.js-course-detail-link")
         course_urls = list({link.get_attribute("href") for link in course_links if "/detail/" in link.get_attribute("href")})
 
+        total = len(course_urls)
         for idx, url in enumerate(course_urls, start=1):
             driver.get(url)
             try:
@@ -202,6 +205,8 @@ def start_scraping():
 
             except Exception as e:
                 print(f"❌ Error in URL {url}: {e}")
+            progress_bar.set(idx / total)
+            progress_bar.update()
 
     finally:
         driver.quit()
@@ -219,24 +224,30 @@ def start_scraping():
 # === GUI ===
 app = ctk.CTk()
 app.title("DAAD Scraper GUI")
-app.geometry("600x480")
+app.geometry("800x700")
 
 ctk.CTkLabel(app, text="Search Keyword:").pack(pady=5)
 entry_query = ctk.CTkEntry(app, width=400)
 entry_query.pack()
 
-ctk.CTkLabel(app, text="Degree Type:").pack(pady=5)
-degree_dropdown = ctk.CTkOptionMenu(app, values=list(degree_map.keys()))
-degree_dropdown.set("1 - Bachelor's")
-degree_dropdown.pack()
+ctk.CTkLabel(app, text="Degree Types (Multiple):").pack(pady=5)
+degree_vars = {}
+for label in degree_map.keys():
+    var = ctk.IntVar()
+    cb = ctk.CTkCheckBox(app, text=label, variable=var)
+    cb.pack(anchor="w")
+    degree_vars[label] = var
 
-ctk.CTkLabel(app, text="Course Language:").pack(pady=5)
-language_dropdown = ctk.CTkOptionMenu(app, values=list(language_map.keys()))
-language_dropdown.set("2 - English only")
-language_dropdown.pack()
+ctk.CTkLabel(app, text="Course Languages (Multiple):").pack(pady=5)
+language_vars = {}
+for label in language_map.keys():
+    var = ctk.IntVar()
+    cb = ctk.CTkCheckBox(app, text=label, variable=var)
+    cb.pack(anchor="w")
+    language_vars[label] = var
 
 ctk.CTkLabel(app, text="Start of Programme:").pack(pady=5)
-bgn_dropdown = ctk.CTkOptionMenu(app, values=list(bgn_map.keys()))
+bgn_dropdown = ctk.CTkOptionMenu(app, values=list(bgn_map.keys()), width=300)
 bgn_dropdown.set("1 - Winter semester")
 bgn_dropdown.pack()
 
@@ -244,6 +255,10 @@ ctk.CTkLabel(app, text="Result Limit:").pack(pady=5)
 entry_limit = ctk.CTkEntry(app, width=100)
 entry_limit.insert(0, "10")
 entry_limit.pack()
+
+progress_bar = ctk.CTkProgressBar(app, width=200)
+progress_bar.pack(pady=15)
+progress_bar.set(0)
 
 ctk.CTkButton(app, text="Search & Export to CSV", command=start_scraping).pack(pady=20)
 
