@@ -100,10 +100,10 @@ def extract_registration_data(driver, wait):
         }
 
 def start_scraping():
-    query = urllib.parse.quote(entry_query.get())
+    query = entry_query.get().strip()
     degree_selected = [k for k, var in degree_vars.items() if var.get() == 1]
     lang_selected = [k for k, var in language_vars.items() if var.get() == 1]
-    bgn = bgn_map[bgn_dropdown.get()]
+    bgn_selected = [k for k, var in bgn_vars.items() if var.get() == 1]
     limit = entry_limit.get().strip()
 
     if not limit.isdigit():
@@ -114,7 +114,7 @@ def start_scraping():
         "q": query,
         "degree[]": [degree_map[d] for d in degree_selected],
         "lang[]": [language_map[l] for l in lang_selected],
-        "bgn[]": [bgn],
+        "bgn[]": [bgn_map[b] for b in bgn_selected],
         "limit": limit,
         "sort": "4",
         "display": "list"
@@ -224,7 +224,7 @@ def start_scraping():
 # === GUI ===
 app = ctk.CTk()
 app.title("DAAD Scraper GUI")
-app.geometry("800x700")
+app.geometry("800x750")
 
 ctk.CTkLabel(app, text="Search Keyword:").pack(pady=5)
 entry_query = ctk.CTkEntry(app, width=400)
@@ -246,17 +246,20 @@ for label in language_map.keys():
     cb.pack(anchor="w")
     language_vars[label] = var
 
-ctk.CTkLabel(app, text="Start of Programme:").pack(pady=5)
-bgn_dropdown = ctk.CTkOptionMenu(app, values=list(bgn_map.keys()), width=300)
-bgn_dropdown.set("1 - Winter semester")
-bgn_dropdown.pack()
+ctk.CTkLabel(app, text="Start of Programme (Multiple):").pack(pady=5)
+bgn_vars = {}
+for label in bgn_map.keys():
+    var = ctk.IntVar()
+    cb = ctk.CTkCheckBox(app, text=label, variable=var)
+    cb.pack(anchor="w")
+    bgn_vars[label] = var
 
 ctk.CTkLabel(app, text="Result Limit:").pack(pady=5)
 entry_limit = ctk.CTkEntry(app, width=100)
 entry_limit.insert(0, "10")
 entry_limit.pack()
 
-progress_bar = ctk.CTkProgressBar(app, width=200)
+progress_bar = ctk.CTkProgressBar(app, width=500)
 progress_bar.pack(pady=15)
 progress_bar.set(0)
 
