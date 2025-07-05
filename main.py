@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from tkinter import filedialog  # ✅ Added for save file dialog
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -212,12 +213,21 @@ def start_scraping():
         driver.quit()
 
     if course_data:
-        keys = list(course_data[0].keys())
-        with open("courses.csv", "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=keys)
-            writer.writeheader()
-            writer.writerows(course_data)
-        messagebox.showinfo("Success", f"Exported {len(course_data)} results to 'courses.csv'")
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv")],
+            title="Save CSV File As",
+            initialfile="courses.csv"  # ✅ Default name
+        )
+        if file_path:
+            keys = list(course_data[0].keys())
+            with open(file_path, "w", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=keys)
+                writer.writeheader()
+                writer.writerows(course_data)
+            messagebox.showinfo("Success", f"Exported {len(course_data)} results to:\n{file_path}")
+        else:
+            messagebox.showwarning("Cancelled", "CSV export cancelled by the user.")
     else:
         messagebox.showwarning("No Results", "No data was scraped.")
 
@@ -259,7 +269,6 @@ for idx, label in enumerate(bgn_map.keys()):
     cb = ctk.CTkCheckBox(bgn_frame, text=label, variable=var)
     cb.grid(row=idx // 3, column=idx % 3, padx=10, pady=2, sticky="w")
     bgn_vars[label] = var
-
 
 ctk.CTkLabel(app, text="Result Limit:").pack(pady=5)
 entry_limit = ctk.CTkEntry(app, width=100)
