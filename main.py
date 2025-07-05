@@ -231,28 +231,35 @@ entry_query = ctk.CTkEntry(app, width=400)
 entry_query.pack()
 
 ctk.CTkLabel(app, text="Degree Types (Multiple):").pack(pady=5)
+degree_frame = ctk.CTkFrame(app)
+degree_frame.pack()
 degree_vars = {}
-for label in degree_map.keys():
+for idx, label in enumerate(degree_map.keys()):
     var = ctk.IntVar()
-    cb = ctk.CTkCheckBox(app, text=label, variable=var)
-    cb.pack(anchor="w")
+    cb = ctk.CTkCheckBox(degree_frame, text=label, variable=var)
+    cb.grid(row=idx // 3, column=idx % 3, padx=10, pady=2, sticky="w")
     degree_vars[label] = var
 
 ctk.CTkLabel(app, text="Course Languages (Multiple):").pack(pady=5)
+language_frame = ctk.CTkFrame(app)
+language_frame.pack()
 language_vars = {}
-for label in language_map.keys():
+for idx, label in enumerate(language_map.keys()):
     var = ctk.IntVar()
-    cb = ctk.CTkCheckBox(app, text=label, variable=var)
-    cb.pack(anchor="w")
+    cb = ctk.CTkCheckBox(language_frame, text=label, variable=var)
+    cb.grid(row=idx // 3, column=idx % 3, padx=10, pady=2, sticky="w")
     language_vars[label] = var
 
 ctk.CTkLabel(app, text="Start of Programme (Multiple):").pack(pady=5)
+bgn_frame = ctk.CTkFrame(app)
+bgn_frame.pack()
 bgn_vars = {}
-for label in bgn_map.keys():
+for idx, label in enumerate(bgn_map.keys()):
     var = ctk.IntVar()
-    cb = ctk.CTkCheckBox(app, text=label, variable=var)
-    cb.pack(anchor="w")
+    cb = ctk.CTkCheckBox(bgn_frame, text=label, variable=var)
+    cb.grid(row=idx // 3, column=idx % 3, padx=10, pady=2, sticky="w")
     bgn_vars[label] = var
+
 
 ctk.CTkLabel(app, text="Result Limit:").pack(pady=5)
 entry_limit = ctk.CTkEntry(app, width=100)
