@@ -241,7 +241,7 @@ entry_query = ctk.CTkEntry(app, width=400)
 entry_query.pack()
 
 ctk.CTkLabel(app, text="Degree Types (Multiple):").pack(pady=5)
-degree_frame = ctk.CTkFrame(app)
+degree_frame = ctk.CTkFrame(app, fg_color="transparent")
 degree_frame.pack()
 degree_vars = {}
 for idx, label in enumerate(degree_map.keys()):
@@ -251,7 +251,7 @@ for idx, label in enumerate(degree_map.keys()):
     degree_vars[label] = var
 
 ctk.CTkLabel(app, text="Course Languages (Multiple):").pack(pady=5)
-language_frame = ctk.CTkFrame(app)
+language_frame = ctk.CTkFrame(app, fg_color="transparent")
 language_frame.pack()
 language_vars = {}
 for idx, label in enumerate(language_map.keys()):
@@ -261,7 +261,7 @@ for idx, label in enumerate(language_map.keys()):
     language_vars[label] = var
 
 ctk.CTkLabel(app, text="Start of Programme (Multiple):").pack(pady=5)
-bgn_frame = ctk.CTkFrame(app)
+bgn_frame = ctk.CTkFrame(app, fg_color="transparent")
 bgn_frame.pack()
 bgn_vars = {}
 for idx, label in enumerate(bgn_map.keys()):
